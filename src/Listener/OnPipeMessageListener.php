@@ -80,6 +80,6 @@ class OnPipeMessageListener implements ListenerInterface
             return;
         }
         
-        $this->config->set($key, array_merge_recursive($config, $configValues));
+        $this->config->set($key, array_replace_recursive($config, $configValues));
     }
 }
