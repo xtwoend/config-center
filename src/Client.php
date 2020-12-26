@@ -89,7 +89,7 @@ class Client implements ClientInterface
             }
             return Json::decode($content);
         } catch (\Throwable $throwable) {
-            $this->logger->error(sprintf('%s[line:%d] in %s', $throwable->getMessage(), $throwable->getLine(), $throwable->getFile()));
+            $this->logger->error(sprintf('Config Center: %s[line:%d] in %s', $throwable->getMessage(), $throwable->getLine(), $throwable->getFile()));
             return [];
         }
     }

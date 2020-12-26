@@ -40,7 +40,7 @@ class ConfigProvider
             'publish' => [
                 [
                     'id' => 'config',
-                    'description' => 'The config for aliyun acm.',
+                    'description' => 'The config for config center.',
                     'source' => __DIR__ . '/../publish/config_center.php',
                     'destination' => BASE_PATH . '/config/autoload/config_center.php',
                 ],

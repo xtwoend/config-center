@@ -31,19 +31,19 @@ class ClientTest extends TestCase
         $container = Mockery::mock(ContainerInterface::class);
         // @TODO Add a test env.
         $configInstance = new Config([
-            'aliyun_acm' => [
+            'config_center' => [
                 'namespace' => '',
                 'data_id' => 'hyperf',
                 'access_key' => '',
                 'secret_key' => '',
             ],
         ]);
-        $configInstance->set('aliyun_acm.test-key', 'pre-value');
+        $configInstance->set('config_center.test-key', 'pre-value');
         $container->shouldReceive('get')->with(ClientFactory::class)->andReturn(new ClientFactory($container));
         $container->shouldReceive('get')->with(ConfigInterface::class)->andReturn($configInstance);
         ApplicationContext::setContainer($container);
         $client = new Client($container);
         $fetchConfig = $client->pull();
-        $this->assertSame('after-value', $fetchConfig['aliyun_acm.test-key']);
+        $this->assertSame('after-value', $fetchConfig['config_center.test-key']);
     }
 }
