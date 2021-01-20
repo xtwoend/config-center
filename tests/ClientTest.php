@@ -34,8 +34,8 @@ class ClientTest extends TestCase
             'config_center' => [
                 'namespace' => '',
                 'data_id' => 'hyperf',
-                'access_key' => '',
-                'secret_key' => '',
+                'key' => '',
+                'secret' => '',
             ],
         ]);
         $configInstance->set('config_center.test-key', 'pre-value');
