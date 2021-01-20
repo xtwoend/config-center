@@ -70,10 +70,14 @@ class Client implements ClientInterface
         $endpoint = $this->config->get('config_center.endpoint', 'localhost:9000');
         $namespace = $this->config->get('config_center.namespace', '');
         $version = $this->config->get('config_center.version', 'v1');
+
+        $key    = $this->config->get('config_center.key', '');
+        $secret = $this->config->get('config_center.secret', '');
     
         try {
             // Get config
             $response = $client->get("{$endpoint}/{$namespace}", [
+                'auth' => [$key, $secret],
                 'headers' => [
                     'Content-Type'  => 'application/json',
                     'Accept'        => 'application/json',

@@ -14,5 +14,7 @@ return [
     'use_standalone_process' => true,
     'interval' => 5,
     'endpoint' => 'localhost:9501',
-    'namespace' => 'gateway'
+    'namespace' => 'gateway',
+    'key'       => '',
+    'secret'    => ''
 ];
