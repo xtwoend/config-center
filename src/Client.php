@@ -69,7 +69,7 @@ class Client implements ClientInterface
 
         if(config('config_center.default') == 'consul')
         {
-            return $this->consule();
+            return $this->consul();
         }else {
             return $this->config();
         }
