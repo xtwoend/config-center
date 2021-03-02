@@ -13,7 +13,8 @@
         "php": ">=7.4",
         "psr/container": "^1.0",
         "hyperf/contract": "~2.1",
-        "hyperf/guzzle": "~2.1"
+        "hyperf/guzzle": "~2.1",
+        "hyperf/consul": "^2.1"
     },
     "require-dev": {
         "hyperf/config": "~2.1",
