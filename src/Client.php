@@ -97,7 +97,7 @@ class Client implements ClientInterface
         });
 
         $response = $kv->get($namespace)->json();
-        $content = $response[0]["Value"]?? null;
+        $content = base64_decode($response[0]["Value"])?? null;
         
         if (! is_null($content)) {
             return Json::decode($content);
