@@ -54,19 +54,13 @@ class Client implements ClientInterface
 
     public function __construct(ContainerInterface $container)
     {
-        $clientFactory = $container->get(GuzzleClientFactory::class);
-        $this->client = $clientFactory->create();
+        $this->client = $container->get(GuzzleClientFactory::class);
         $this->config = $container->get(ConfigInterface::class);
         $this->logger = $container->get(StdoutLoggerInterface::class);
     }
 
     public function pull(): array
     {
-        $client = $this->client;
-        if (! $client instanceof GuzzleHttp\Client) {
-            throw new RuntimeException('config center: Invalid http client.');
-        }
-
         if(config('config_center.default') == 'consul')
         {
             return $this->consul();
@@ -90,6 +84,7 @@ class Client implements ClientInterface
 
         $key    = $this->config->get('config_center.key', '');
         $secret = $this->config->get('config_center.secret', '');
+        $client = $this->client;
 
         // Get config
         $kv = new KV(function () use ($client, $endpoint, $secret) {
@@ -120,9 +115,11 @@ class Client implements ClientInterface
 
         $key    = $this->config->get('config_center.key', '');
         $secret = $this->config->get('config_center.secret', '');
-
+        $client = $this->client->create([
+            'base_uri' => $endpoint,
+        ]);
         // Get config
-        $response = $client->get("{$endpoint}/{$namespace}", [
+        $response = $client->get("/{$namespace}", [
             'auth' => [$key, $secret],
             'headers' => [
                 'Content-Type'  => 'application/json',
