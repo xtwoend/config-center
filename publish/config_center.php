@@ -10,6 +10,7 @@ declare(strict_types=1);
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 return [
+    'default' => 'config-center',
     'enable' => true,
     'use_standalone_process' => true,
     'interval' => 5,

@@ -12,12 +12,13 @@ declare(strict_types=1);
 namespace Xtwoend\ConfigCenter;
 
 use GuzzleHttp;
+use Hyperf\Consul\KV;
+use RuntimeException;
+use Hyperf\Utils\Codec\Json;
 use Hyperf\Contract\ConfigInterface;
+use Psr\Container\ContainerInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Guzzle\ClientFactory as GuzzleClientFactory;
-use Hyperf\Utils\Codec\Json;
-use Psr\Container\ContainerInterface;
-use RuntimeException;
 
 class Client implements ClientInterface
 {
@@ -66,6 +67,22 @@ class Client implements ClientInterface
             throw new RuntimeException('config center: Invalid http client.');
         }
 
+        if(config('config_center.default') == 'consul')
+        {
+            return $this->consule();
+        }else {
+            return $this->config();
+        }
+    
+        try {
+        } catch (\Throwable $throwable) {
+            $this->logger->error(sprintf('Config Center: %s[line:%d] in %s', $throwable->getMessage(), $throwable->getLine(), $throwable->getFile()));
+            return [];
+        }
+    }
+
+    public function consul()
+    {
         // ACM config
         $endpoint = $this->config->get('config_center.endpoint', 'localhost:9000');
         $namespace = $this->config->get('config_center.namespace', '');
@@ -73,28 +90,54 @@ class Client implements ClientInterface
 
         $key    = $this->config->get('config_center.key', '');
         $secret = $this->config->get('config_center.secret', '');
-    
-        try {
-            // Get config
-            $response = $client->get("{$endpoint}/{$namespace}", [
-                'auth' => [$key, $secret],
+
+        // Get config
+        $kv = new KV(function () use ($client, $endpoint, $secret) {
+            return $client->create([
+                'base_uri' => $endpoint,
                 'headers' => [
-                    'Content-Type'  => 'application/json',
-                    'Accept'        => 'application/json',
-                    'version'       => $version
-                ]
+                    'X-Consul-Token' => $secret
+                ],
             ]);
-            if ($response->getStatusCode() !== 200) {
-                throw new RuntimeException('Get config failed from Config center.');
-            }
-            $content = $response->getBody()->getContents();
-            if (! $content) {
-                return [];
-            }
+        });
+
+        $response = $kv->get($namespace)->json();
+        $content = $response[0]["Value"]?? null;
+        
+        if (! is_null($content)) {
             return Json::decode($content);
-        } catch (\Throwable $throwable) {
-            $this->logger->error(sprintf('Config Center: %s[line:%d] in %s', $throwable->getMessage(), $throwable->getLine(), $throwable->getFile()));
+        }
+
+        return [];
+    }
+
+    public function config()
+    {
+        // ACM config
+        $endpoint = $this->config->get('config_center.endpoint', 'localhost:9000');
+        $namespace = $this->config->get('config_center.namespace', '');
+        $version = $this->config->get('config_center.version', 'v1');
+
+        $key    = $this->config->get('config_center.key', '');
+        $secret = $this->config->get('config_center.secret', '');
+
+        // Get config
+        $response = $client->get("{$endpoint}/{$namespace}", [
+            'auth' => [$key, $secret],
+            'headers' => [
+                'Content-Type'  => 'application/json',
+                'Accept'        => 'application/json',
+                'version'       => $version
+            ]
+        ]);
+        if ($response->getStatusCode() !== 200) {
+            throw new RuntimeException('Get config failed from Config center.');
+        }
+        $content = $response->getBody()->getContents();
+        if (! $content) {
             return [];
         }
+
+        return Json::decode($content);
     }
 }

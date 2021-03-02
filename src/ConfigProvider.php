@@ -21,7 +21,7 @@ class ConfigProvider
     {
         return [
             'dependencies' => [
-                ClientInterface::class => Consul::class,
+                ClientInterface::class => Client::class,
             ],
             'processes' => [
                 ConfigFetcherProcess::class,
