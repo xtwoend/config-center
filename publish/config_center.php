@@ -10,12 +10,12 @@ declare(strict_types=1);
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 return [
-    'default' => 'config-center',
-    'enable' => true,
-    'use_standalone_process' => true,
+    'default' => env('CONFIG_CENTER_DEFAULT', 'config-center'),
+    'enable' => env('CONFIG_CENTER_ENABLE', false),
+    'use_standalone_process' => false,
     'interval' => 5,
-    'endpoint' => 'localhost:9501',
-    'namespace' => 'gateway',
-    'key'       => '',
-    'secret'    => ''
+    'endpoint' => env('CONFIG_CENTER_HOST', 'localhost:8000'),
+    'namespace' => env('CONFIG_CENTER_NAMESPACE', 'gateway'),
+    'key'       => env('CONFIG_CENTER_USER', 'client'),
+    'secret'    => env('CONFIG_CENTER_USER', 'secret'),
 ];
