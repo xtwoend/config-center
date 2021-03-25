@@ -16,6 +16,7 @@ return [
     'interval' => 5,
     'endpoint' => env('CONFIG_CENTER_HOST', 'localhost:8000'),
     'namespace' => env('CONFIG_CENTER_NAMESPACE', 'gateway'),
-    'key'       => env('CONFIG_CENTER_USER', 'client'),
-    'secret'    => env('CONFIG_CENTER_USER', 'secret'),
+    'api_key'   => env('CONFIG_CENTER_API_KEY', null),
+    'client'       => env('CONFIG_CENTER_CLIENT', null),
+    'secret'    => env('CONFIG_CENTER_SECRET', null),
 ];

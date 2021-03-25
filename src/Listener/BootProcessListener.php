@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Xtwoend\ConfigCenter\Listener;
 
 use Hyperf\Command\Event\BeforeHandle;
@@ -106,7 +107,7 @@ class BootProcessListener implements ListenerInterface
             $this->config->set($key, $configValues);
             return;
         }
-        
+
         $this->config->set($key, array_replace_recursive($config, $configValues));
     }
 }

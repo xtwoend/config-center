@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Xtwoend\ConfigCenter;
 
 use GuzzleHttp;
@@ -61,13 +62,12 @@ class Client implements ClientInterface
 
     public function pull(): array
     {
-        if(config('config_center.default') == 'consul')
-        {
+        if (config('config_center.default') == 'consul') {
             return $this->consul();
-        }else {
+        } else {
             return $this->config();
         }
-    
+
         try {
         } catch (\Throwable $throwable) {
             $this->logger->error(sprintf('Config Center: %s[line:%d] in %s', $throwable->getMessage(), $throwable->getLine(), $throwable->getFile()));
@@ -82,23 +82,25 @@ class Client implements ClientInterface
         $namespace = $this->config->get('config_center.namespace', '');
         $version = $this->config->get('config_center.version', 'v1');
 
-        $key    = $this->config->get('config_center.key', '');
+        $client = $this->config->get('config_center.client', '');
         $secret = $this->config->get('config_center.secret', '');
+        $apiKey = $this->config->get('config_center.api_key', '');
         $client = $this->client;
 
         // Get config
-        $kv = new KV(function () use ($client, $endpoint, $secret) {
+        $kv = new KV(function () use ($client, $endpoint, $secret, $apiKey) {
             return $client->create([
                 'base_uri' => $endpoint,
+                'auth' => [$client, $secret],
                 'headers' => [
-                    'X-Consul-Token' => $secret
+                    'X-Consul-Token' => $apiKey
                 ],
             ]);
         });
 
         $response = $kv->get($namespace)->json();
         $content = base64_decode($response[0]["Value"])?? null;
-        
+
         if (! is_null($content)) {
             return Json::decode($content);
         }
@@ -113,11 +115,12 @@ class Client implements ClientInterface
         $namespace = $this->config->get('config_center.namespace', '');
         $version = $this->config->get('config_center.version', 'v1');
 
-        $key    = $this->config->get('config_center.key', '');
+        $client = $this->config->get('config_center.client', '');
         $secret = $this->config->get('config_center.secret', '');
         $client = $this->client->create([
             'base_uri' => $endpoint,
         ]);
+            
         // Get config
         $response = $client->get("/{$namespace}", [
             'auth' => [$key, $secret],
@@ -127,10 +130,13 @@ class Client implements ClientInterface
                 'version'       => $version
             ]
         ]);
+
         if ($response->getStatusCode() !== 200) {
             throw new RuntimeException('Get config failed from Config center.');
         }
+
         $content = $response->getBody()->getContents();
+
         if (! $content) {
             return [];
         }
